@@ -9,7 +9,7 @@ import (
 
 	_ "github.com/joho/godotenv/autoload"
 
-	"cafebuzz-backend/internal/database"
+	"github.com/hadihalimm/cafebuzz-backend/internal/database"
 )
 
 type Server struct {

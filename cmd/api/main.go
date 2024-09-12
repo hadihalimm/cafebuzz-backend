@@ -1,8 +1,9 @@
 package main
 
 import (
-	"cafebuzz-backend/internal/server"
 	"fmt"
+
+	"github.com/hadihalimm/cafebuzz-backend/internal/server"
 )
 
 func main() {

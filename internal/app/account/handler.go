@@ -16,7 +16,7 @@ func NewHandler(service Service) *Handler {
 	return &Handler{service: service}
 }
 
-func (h *Handler) Create(c *gin.Context) {
+func (h *Handler) Register(c *gin.Context) {
 	var input request.RegisterRequest
 	err := c.ShouldBindJSON(&input)
 	if err != nil {
@@ -28,7 +28,7 @@ func (h *Handler) Create(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 	}
 
-	result, err := h.service.Create(input)
+	result, err := h.service.Register(input)
 	if err != nil {
 		response := response.Response{
 			Success: false,

@@ -7,7 +7,7 @@ import (
 )
 
 type Service interface {
-	Create(request request.RegisterRequest) (Account, error)
+	Register(request request.RegisterRequest) (Account, error)
 }
 
 type service struct {
@@ -22,7 +22,7 @@ func NewService(repository Repository, validate *validator.Validate) Service {
 	}
 }
 
-func (s *service) Create(request request.RegisterRequest) (Account, error) {
+func (s *service) Register(request request.RegisterRequest) (Account, error) {
 	newAccount := Account{}
 	validateError := s.validate.Struct(request)
 	if validateError != nil {

@@ -11,7 +11,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	v1 := r.Group("api/v1")
 	{
-		v1.POST("/account", s.accountHandler.Create)
+		v1.POST("/account", s.accountHandler.Register)
 	}
 
 	return r

@@ -7,13 +7,15 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"github.com/hadihalimm/cafebuzz-backend/internal/api/request"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type Service interface {
-	Register(request request.RegisterRequest) (Account, error)
+	Register(request request.RegisterRequest) (*Account, error)
 	Login(request request.LoginRequest) (string, error)
+	Update(uuid uuid.UUID, request request.AccountUpdateRequest) (*Account, error)
 }
 
 type service struct {
@@ -28,17 +30,17 @@ func NewService(repository Repository, validate *validator.Validate) Service {
 	}
 }
 
-func (s *service) Register(request request.RegisterRequest) (Account, error) {
+func (s *service) Register(request request.RegisterRequest) (*Account, error) {
 	var accountReq Account
 
 	validateError := s.validate.Struct(request)
 	if validateError != nil {
-		return accountReq, validateError
+		return nil, validateError
 	}
 
 	_, findError := s.repo.FindByUsername(request.Username)
 	if findError == nil {
-		return accountReq, errors.New("username already exists")
+		return nil, errors.New("username already exists")
 	}
 
 	accountReq.Username = request.Username
@@ -48,7 +50,7 @@ func (s *service) Register(request request.RegisterRequest) (Account, error) {
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
 	accountReq.PasswordHash = string(hashedPassword)
 
-	newAccount, createError := s.repo.Create(accountReq)
+	newAccount, createError := s.repo.Create(&accountReq)
 	if createError != nil {
 		return newAccount, createError
 	}
@@ -84,4 +86,21 @@ func (s *service) Login(request request.LoginRequest) (string, error) {
 	}
 
 	return token, nil
+}
+
+func (s *service) Update(uuid uuid.UUID, request request.AccountUpdateRequest) (*Account, error) {
+	accountFound, findError := s.repo.FindByUUID(uuid)
+	if findError != nil {
+		return nil, findError
+	}
+
+	accountFound.FirstName = request.FirstName
+	accountFound.LastName = request.LastName
+	accountFound.ProfilePicture = request.ProfilePicture
+	accountFound.Bio = request.Bio
+	updatedAccount, updateError := s.repo.Update(accountFound)
+	if updateError != nil {
+		return nil, updateError
+	}
+	return updatedAccount, nil
 }

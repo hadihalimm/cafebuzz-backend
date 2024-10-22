@@ -17,6 +17,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 		account := v1.Group("/account")
 		{
 			account.GET("/", s.RequireAuth, s.accountHandler.GetCurrentAccount)
+			account.PUT("/", s.RequireAuth, s.accountHandler.UpdateAccountDetails)
 		}
 	}
 

@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/hadihalimm/cafebuzz-backend/internal/api/request"
 	"github.com/hadihalimm/cafebuzz-backend/internal/api/response"
 )
@@ -89,4 +90,37 @@ func (h *Handler) GetCurrentAccount(c *gin.Context) {
 		Data:    account,
 	}
 	c.JSON(http.StatusOK, response)
+}
+
+func (h *Handler) UpdateAccountDetails(c *gin.Context) {
+	var input request.AccountUpdateRequest
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		response := response.Response{
+			Success: false,
+			Message: "Something went wrong",
+			Data:    err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	account, _ := c.Get("currentUser")
+	updatedAccount, err := h.service.Update(account.(uuid.UUID), input)
+	if err != nil {
+		response := response.Response{
+			Success: false,
+			Message: "Something went wrong",
+			Data:    err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := response.Response{
+		Success: true,
+		Message: "Successfully updated the account.",
+		Data:    updatedAccount,
+	}
+	c.JSON(http.StatusCreated, response)
 }

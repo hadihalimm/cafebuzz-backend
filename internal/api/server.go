@@ -14,24 +14,24 @@ import (
 
 type Server struct {
 	port           int
-	db             config.Database
+	DB             *config.Database
 	accountHandler *account.Handler
 }
 
-func NewServer() *http.Server {
+func NewServer() (*http.Server, *Server) {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
-	db := config.ConnectToDatabase()
-	defer db.Close()
-	db.AutoMigrate(&account.Account{})
+	DB := config.ConnectToDatabase()
+	DB.DropTable(&account.Account{})
+	DB.AutoMigrate(&account.Account{})
 	validate := validator.New()
 
-	accountRepo := account.NewRepository(db)
+	accountRepo := account.NewRepository(DB)
 	accountService := account.NewService(accountRepo, validate)
 	accountHandler := account.NewHandler(accountService)
 
 	NewServer := &Server{
 		port:           port,
-		db:             db,
+		DB:             DB,
 		accountHandler: accountHandler,
 	}
 
@@ -43,5 +43,5 @@ func NewServer() *http.Server {
 		WriteTimeout: 30 * time.Second,
 	}
 
-	return server
+	return server, NewServer
 }

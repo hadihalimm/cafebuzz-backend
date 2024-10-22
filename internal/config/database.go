@@ -10,14 +10,8 @@ import (
 	"gorm.io/gorm"
 )
 
-type Database interface {
-	Close() error
-	AutoMigrate(value ...interface{}) error
-	Create(value interface{}) error
-}
-
-type database struct {
-	db *gorm.DB
+type Database struct {
+	Gorm *gorm.DB
 }
 
 var (
@@ -26,10 +20,10 @@ var (
 	host       = os.Getenv("DB_HOST")
 	port       = os.Getenv("DB_PORT")
 	dbName     = os.Getenv("DB_NAME")
-	dbInstance *database
+	dbInstance *Database
 )
 
-func ConnectToDatabase() Database {
+func ConnectToDatabase() *Database {
 	if dbInstance != nil {
 		return dbInstance
 	}
@@ -40,24 +34,24 @@ func ConnectToDatabase() Database {
 		log.Fatal(err)
 	}
 	log.Print("Successfully connected to database")
-	dbInstance := &database{
-		db: gormDB,
+	dbInstance := &Database{
+		Gorm: gormDB,
 	}
 	return dbInstance
 }
 
-func (d *database) Close() error {
-	sqlDB, err := d.db.DB()
+func (d *Database) Close() error {
+	sqlDB, err := d.Gorm.DB()
 	if err != nil {
 		log.Fatal(err)
 	}
 	return sqlDB.Close()
 }
 
-func (d *database) AutoMigrate(value ...interface{}) error {
-	return d.db.AutoMigrate(value...)
+func (d *Database) AutoMigrate(value ...interface{}) error {
+	return d.Gorm.AutoMigrate(value...)
 }
 
-func (d *database) Create(value interface{}) error {
-	return d.db.Create(value).Error
+func (d *Database) DropTable(dst ...interface{}) error {
+	return d.Gorm.Migrator().DropTable(dst...)
 }

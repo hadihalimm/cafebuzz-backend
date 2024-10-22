@@ -47,3 +47,46 @@ func (h *Handler) Register(c *gin.Context) {
 	}
 	c.JSON(http.StatusCreated, response)
 }
+
+func (h *Handler) Login(c *gin.Context) {
+	var input request.LoginRequest
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		response := response.Response{
+			Success: false,
+			Message: "Something went wrong",
+			Data:    err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	result, err := h.service.Login(input)
+	if err != nil {
+		response := response.Response{
+			Success: false,
+			Message: "Something went wrong",
+			Data:    err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, response)
+	}
+
+	response := response.Response{
+		Success: true,
+		Message: "Login successful!",
+		Data: gin.H{
+			"token": result,
+		},
+	}
+	c.JSON(http.StatusCreated, response)
+}
+
+func (h *Handler) GetCurrentAccount(c *gin.Context) {
+	account, _ := c.Get("currentUser")
+	response := response.Response{
+		Success: true,
+		Message: "Successfully retrieved current account.",
+		Data:    account,
+	}
+	c.JSON(http.StatusOK, response)
+}

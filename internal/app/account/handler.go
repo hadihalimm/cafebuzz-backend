@@ -26,6 +26,7 @@ func (h *Handler) Register(c *gin.Context) {
 			Data:    err.Error(),
 		}
 		c.JSON(http.StatusBadRequest, response)
+		return
 	}
 
 	result, err := h.service.Register(input)
@@ -36,6 +37,7 @@ func (h *Handler) Register(c *gin.Context) {
 			Data:    err.Error(),
 		}
 		c.JSON(http.StatusBadRequest, response)
+		return
 	}
 
 	response := response.Response{

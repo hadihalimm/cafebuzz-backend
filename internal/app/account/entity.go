@@ -7,7 +7,7 @@ import (
 )
 
 type Account struct {
-	UUID           uuid.UUID `json:"id" gorm:"primaryKey;default:uuid_generate_v4()"`
+	UUID           uuid.UUID `json:"uuid" gorm:"primaryKey;default:uuid_generate_v4()"`
 	Username       string    `json:"username" gorm:"unique;not null"`
 	FirstName      string    `json:"first_name" gorm:"not null"`
 	LastName       string    `json:"last_name" gorm:"not null"`

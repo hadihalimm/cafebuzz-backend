@@ -1,6 +1,8 @@
 package account
 
 import (
+	"errors"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/hadihalimm/cafebuzz-backend/internal/api/request"
 	"golang.org/x/crypto/bcrypt"
@@ -8,6 +10,7 @@ import (
 
 type Service interface {
 	Register(request request.RegisterRequest) (Account, error)
+	// Login(request request.LoginRequest) error
 }
 
 type service struct {
@@ -23,21 +26,27 @@ func NewService(repository Repository, validate *validator.Validate) Service {
 }
 
 func (s *service) Register(request request.RegisterRequest) (Account, error) {
-	newAccount := Account{}
+	req := &Account{}
 	validateError := s.validate.Struct(request)
 	if validateError != nil {
-		return newAccount, validateError
+		return *req, validateError
 	}
-	newAccount.Username = request.Username
-	newAccount.FirstName = request.FirstName
-	newAccount.LastName = request.LastName
-	newAccount.Email = request.Email
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
-	newAccount.PasswordHash = string(hashedPassword)
 
-	repoError := s.repo.Create(newAccount)
-	if repoError != nil {
-		return newAccount, repoError
+	_, findError := s.repo.FindByUsername(request.Username)
+	if findError == nil {
+		return *req, errors.New("username already exists")
+	}
+
+	req.Username = request.Username
+	req.FirstName = request.FirstName
+	req.LastName = request.LastName
+	req.Email = request.Email
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
+	req.PasswordHash = string(hashedPassword)
+
+	newAccount, createError := s.repo.Create(*req)
+	if createError != nil {
+		return newAccount, createError
 	}
 	return newAccount, nil
 }

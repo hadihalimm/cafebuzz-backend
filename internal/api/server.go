@@ -21,6 +21,8 @@ type Server struct {
 func NewServer() *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	db := config.ConnectToDatabase()
+	defer db.Close()
+	db.AutoMigrate(&account.Account{})
 	validate := validator.New()
 
 	accountRepo := account.NewRepository(db)

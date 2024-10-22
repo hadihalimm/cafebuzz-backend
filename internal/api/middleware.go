@@ -63,6 +63,6 @@ func (s *Server) RequireAuth(c *gin.Context) {
 		return
 	}
 
-	c.Set("currentUser", account)
+	c.Set("currentUser", account.UUID)
 	c.Next()
 }

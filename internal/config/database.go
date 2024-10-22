@@ -12,6 +12,7 @@ import (
 
 type Database interface {
 	Close() error
+	AutoMigrate(value ...interface{}) error
 	Create(value interface{}) error
 }
 
@@ -51,6 +52,10 @@ func (d *database) Close() error {
 		log.Fatal(err)
 	}
 	return sqlDB.Close()
+}
+
+func (d *database) AutoMigrate(value ...interface{}) error {
+	return d.db.AutoMigrate(value...)
 }
 
 func (d *database) Create(value interface{}) error {

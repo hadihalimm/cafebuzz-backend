@@ -8,6 +8,7 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
 
 type Database struct {
@@ -15,25 +16,36 @@ type Database struct {
 }
 
 var (
-	user       = os.Getenv("DB_USER")
-	password   = os.Getenv("DB_PASSWORD")
-	host       = os.Getenv("DB_HOST")
-	port       = os.Getenv("DB_PORT")
-	dbName     = os.Getenv("DB_NAME")
-	dbInstance *Database
+	// user     = os.Getenv("DB_USER")
+	// password = os.Getenv("DB_PASSWORD")
+	// host     = os.Getenv("DB_HOST")
+	// port     = os.Getenv("DB_PORT")
+	// dbName   = os.Getenv("DB_NAME")
+
+	userLocal     = os.Getenv("DB_USER_LOCAL")
+	passwordLocal = os.Getenv("DB_PASSWORD_LOCAL")
+	hostLocal     = os.Getenv("DB_HOST_LOCAL")
+	portLocal     = os.Getenv("DB_PORT_LOCAL")
+	dbNameLocal   = os.Getenv("DB_NAME_LOCAL")
+	dbInstance    *Database
 )
 
 func ConnectToDatabase() *Database {
 	if dbInstance != nil {
 		return dbInstance
 	}
-	connStr := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s", user, password, host, port, dbName)
-	gormDB, err := gorm.Open(postgres.Open(connStr), &gorm.Config{})
+	// connStr := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s", user, password, host, port, dbName)
+	connStrLocal := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s", userLocal, passwordLocal, hostLocal, portLocal, dbNameLocal)
+	gormDB, err := gorm.Open(postgres.Open(connStrLocal), &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{
+			SingularTable: true,
+		},
+	})
 
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Print("Successfully connected to database")
+	log.Printf("Successfully connected to database")
 	dbInstance := &Database{
 		Gorm: gormDB,
 	}

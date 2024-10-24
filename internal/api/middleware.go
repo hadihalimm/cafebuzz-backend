@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	"github.com/hadihalimm/cafebuzz-backend/internal/app/account"
+	"github.com/hadihalimm/cafebuzz-backend/internal/models"
 	_ "github.com/joho/godotenv/autoload"
 )
 
@@ -55,7 +55,7 @@ func (s *Server) RequireAuth(c *gin.Context) {
 		return
 	}
 
-	var account account.Account
+	var account models.Account
 	s.DB.Gorm.Where("UUID = ?", claims["uuid"]).Find(&account)
 
 	if account.UUID == uuid.Nil {

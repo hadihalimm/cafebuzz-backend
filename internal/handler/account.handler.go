@@ -1,4 +1,4 @@
-package account
+package handler
 
 import (
 	"net/http"
@@ -7,17 +7,18 @@ import (
 	"github.com/google/uuid"
 	"github.com/hadihalimm/cafebuzz-backend/internal/api/request"
 	"github.com/hadihalimm/cafebuzz-backend/internal/api/response"
+	"github.com/hadihalimm/cafebuzz-backend/internal/services"
 )
 
-type Handler struct {
-	service Service
+type AccountHandler struct {
+	service services.AccountService
 }
 
-func NewHandler(service Service) *Handler {
-	return &Handler{service: service}
+func NewAccountHandler(service services.AccountService) *AccountHandler {
+	return &AccountHandler{service: service}
 }
 
-func (h *Handler) Register(c *gin.Context) {
+func (h *AccountHandler) Register(c *gin.Context) {
 	var input request.RegisterRequest
 	err := c.ShouldBindJSON(&input)
 	if err != nil {
@@ -49,7 +50,7 @@ func (h *Handler) Register(c *gin.Context) {
 	c.JSON(http.StatusCreated, response)
 }
 
-func (h *Handler) Login(c *gin.Context) {
+func (h *AccountHandler) Login(c *gin.Context) {
 	var input request.LoginRequest
 	err := c.ShouldBindJSON(&input)
 	if err != nil {
@@ -82,7 +83,7 @@ func (h *Handler) Login(c *gin.Context) {
 	c.JSON(http.StatusCreated, response)
 }
 
-func (h *Handler) GetCurrentAccount(c *gin.Context) {
+func (h *AccountHandler) GetCurrentAccount(c *gin.Context) {
 	account, _ := c.Get("currentUser")
 	response := response.Response{
 		Success: true,
@@ -92,7 +93,7 @@ func (h *Handler) GetCurrentAccount(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (h *Handler) UpdateAccountDetails(c *gin.Context) {
+func (h *AccountHandler) UpdateAccountDetails(c *gin.Context) {
 	var input request.AccountUpdateRequest
 	err := c.ShouldBindJSON(&input)
 	if err != nil {

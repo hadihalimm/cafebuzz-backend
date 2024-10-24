@@ -8,7 +8,6 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/schema"
 )
 
 type Database struct {
@@ -36,11 +35,7 @@ func ConnectToDatabase() *Database {
 	}
 	// connStr := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s", user, password, host, port, dbName)
 	connStrLocal := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s", userLocal, passwordLocal, hostLocal, portLocal, dbNameLocal)
-	gormDB, err := gorm.Open(postgres.Open(connStrLocal), &gorm.Config{
-		NamingStrategy: schema.NamingStrategy{
-			SingularTable: true,
-		},
-	})
+	gormDB, err := gorm.Open(postgres.Open(connStrLocal), &gorm.Config{})
 
 	if err != nil {
 		log.Fatal(err)

@@ -1,4 +1,4 @@
-package account
+package services
 
 import (
 	"errors"
@@ -9,29 +9,31 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/hadihalimm/cafebuzz-backend/internal/api/request"
+	"github.com/hadihalimm/cafebuzz-backend/internal/models"
+	"github.com/hadihalimm/cafebuzz-backend/internal/repository"
 	"golang.org/x/crypto/bcrypt"
 )
 
-type Service interface {
-	Register(request request.RegisterRequest) (*Account, error)
+type AccountService interface {
+	Register(request request.RegisterRequest) (*models.Account, error)
 	Login(request request.LoginRequest) (string, error)
-	Update(uuid uuid.UUID, request request.AccountUpdateRequest) (*Account, error)
+	Update(uuid uuid.UUID, request request.AccountUpdateRequest) (*models.Account, error)
 }
 
 type service struct {
-	repo     Repository
+	repo     repository.AccountRepository
 	validate *validator.Validate
 }
 
-func NewService(repository Repository, validate *validator.Validate) Service {
+func NewAccountService(repository repository.AccountRepository, validate *validator.Validate) AccountService {
 	return &service{
 		repo:     repository,
 		validate: validate,
 	}
 }
 
-func (s *service) Register(request request.RegisterRequest) (*Account, error) {
-	var accountReq Account
+func (s *service) Register(request request.RegisterRequest) (*models.Account, error) {
+	var accountReq models.Account
 
 	validateError := s.validate.Struct(request)
 	if validateError != nil {
@@ -58,7 +60,7 @@ func (s *service) Register(request request.RegisterRequest) (*Account, error) {
 }
 
 func (s *service) Login(request request.LoginRequest) (string, error) {
-	var accountFound Account
+	var accountFound models.Account
 
 	validateError := s.validate.Struct(request)
 	if validateError != nil {
@@ -88,7 +90,7 @@ func (s *service) Login(request request.LoginRequest) (string, error) {
 	return token, nil
 }
 
-func (s *service) Update(uuid uuid.UUID, request request.AccountUpdateRequest) (*Account, error) {
+func (s *service) Update(uuid uuid.UUID, request request.AccountUpdateRequest) (*models.Account, error) {
 	accountFound, findError := s.repo.FindByUUID(uuid)
 	if findError != nil {
 		return nil, findError

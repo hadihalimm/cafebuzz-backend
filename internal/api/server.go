@@ -8,26 +8,29 @@ import (
 	"time"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/hadihalimm/cafebuzz-backend/internal/app/account"
 	"github.com/hadihalimm/cafebuzz-backend/internal/config"
+	"github.com/hadihalimm/cafebuzz-backend/internal/handler"
+	"github.com/hadihalimm/cafebuzz-backend/internal/models"
+	"github.com/hadihalimm/cafebuzz-backend/internal/repository"
+	"github.com/hadihalimm/cafebuzz-backend/internal/services"
 )
 
 type Server struct {
 	port           int
 	DB             *config.Database
-	accountHandler *account.Handler
+	accountHandler *handler.AccountHandler
 }
 
 func NewServer() (*http.Server, *Server) {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	DB := config.ConnectToDatabase()
-	DB.DropTable(&account.Account{})
-	DB.AutoMigrate(&account.Account{})
+	DB.DropTable(&models.Account{})
+	DB.AutoMigrate(&models.Account{})
 	validate := validator.New()
 
-	accountRepo := account.NewRepository(DB)
-	accountService := account.NewService(accountRepo, validate)
-	accountHandler := account.NewHandler(accountService)
+	accountRepo := repository.NewAccountRepository(DB)
+	accountService := services.NewAccountService(accountRepo, validate)
+	accountHandler := handler.NewAccountHandler(accountService)
 
 	NewServer := &Server{
 		port:           port,

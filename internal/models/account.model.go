@@ -1,4 +1,4 @@
-package account
+package models
 
 import (
 	"time"
@@ -15,9 +15,9 @@ type Account struct {
 	PasswordHash   string    `json:"password_hash" gorm:"not null"`
 	ProfilePicture string    `json:"profile_picture" gorm:"size:255"` // URL to their profile picture
 	Bio            string    `json:"bio" gorm:"type:text"`
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	// Cafes          []Cafe    `gorm:"foreignKey:OwnerID"` // User can own multiple cafes
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
+	// Cafes          []cafe.Cafe `gorm:"foreignKey:OwnerID"` // User can own multiple cafes
 	// Posts          []Post    `gorm:"foreignKey:UserID"`
 	// Follows        []Follow  `gorm:"foreignKey:FollowerID"`
 	// Comments       []Comment `gorm:"foreignKey:UserID"`

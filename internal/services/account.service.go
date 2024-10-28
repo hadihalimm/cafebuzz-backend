@@ -15,24 +15,25 @@ import (
 )
 
 type AccountService interface {
-	Register(request request.RegisterRequest) (*models.Account, error)
+	Register(request request.AccountRegisterRequest) (*models.Account, error)
 	Login(request request.LoginRequest) (string, error)
+	Details(uuid uuid.UUID) (*models.Account, error)
 	Update(uuid uuid.UUID, request request.AccountUpdateRequest) (*models.Account, error)
 }
 
-type service struct {
+type accountService struct {
 	repo     repository.AccountRepository
 	validate *validator.Validate
 }
 
 func NewAccountService(repository repository.AccountRepository, validate *validator.Validate) AccountService {
-	return &service{
+	return &accountService{
 		repo:     repository,
 		validate: validate,
 	}
 }
 
-func (s *service) Register(request request.RegisterRequest) (*models.Account, error) {
+func (s *accountService) Register(request request.AccountRegisterRequest) (*models.Account, error) {
 	var accountReq models.Account
 
 	validateError := s.validate.Struct(request)
@@ -46,8 +47,7 @@ func (s *service) Register(request request.RegisterRequest) (*models.Account, er
 	}
 
 	accountReq.Username = request.Username
-	accountReq.FirstName = request.FirstName
-	accountReq.LastName = request.LastName
+	accountReq.Name = request.Name
 	accountReq.Email = request.Email
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
 	accountReq.PasswordHash = string(hashedPassword)
@@ -59,8 +59,8 @@ func (s *service) Register(request request.RegisterRequest) (*models.Account, er
 	return newAccount, nil
 }
 
-func (s *service) Login(request request.LoginRequest) (string, error) {
-	var accountFound models.Account
+func (s *accountService) Login(request request.LoginRequest) (string, error) {
+	var accountFound *models.Account
 
 	validateError := s.validate.Struct(request)
 	if validateError != nil {
@@ -78,8 +78,9 @@ func (s *service) Login(request request.LoginRequest) (string, error) {
 	}
 
 	generateToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"uuid": accountFound.UUID,
-		"exp":  time.Now().Add(time.Hour * 24).Unix(),
+		"uuid":         accountFound.UUID,
+		"account_type": "personal",
+		"exp":          time.Now().Add(time.Hour * 24).Unix(),
 	})
 
 	token, TokenError := generateToken.SignedString([]byte(os.Getenv("JWT_SECRET")))
@@ -90,14 +91,21 @@ func (s *service) Login(request request.LoginRequest) (string, error) {
 	return token, nil
 }
 
-func (s *service) Update(uuid uuid.UUID, request request.AccountUpdateRequest) (*models.Account, error) {
+func (s *accountService) Details(uuid uuid.UUID) (*models.Account, error) {
+	accountFound, findError := s.repo.FindByUUID(uuid)
+	if findError != nil {
+		return nil, findError
+	}
+	return accountFound, nil
+}
+
+func (s *accountService) Update(uuid uuid.UUID, request request.AccountUpdateRequest) (*models.Account, error) {
 	accountFound, findError := s.repo.FindByUUID(uuid)
 	if findError != nil {
 		return nil, findError
 	}
 
-	accountFound.FirstName = request.FirstName
-	accountFound.LastName = request.LastName
+	accountFound.Name = request.Name
 	accountFound.ProfilePicture = request.ProfilePicture
 	accountFound.Bio = request.Bio
 	updatedAccount, updateError := s.repo.Update(accountFound)

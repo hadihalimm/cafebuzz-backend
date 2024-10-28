@@ -19,7 +19,7 @@ func NewAccountHandler(service services.AccountService) *AccountHandler {
 }
 
 func (h *AccountHandler) Register(c *gin.Context) {
-	var input request.RegisterRequest
+	var input request.AccountRegisterRequest
 	err := c.ShouldBindJSON(&input)
 	if err != nil {
 		response := response.Response{
@@ -71,6 +71,7 @@ func (h *AccountHandler) Login(c *gin.Context) {
 			Data:    err.Error(),
 		}
 		c.JSON(http.StatusBadRequest, response)
+		return
 	}
 
 	response := response.Response{

@@ -84,8 +84,18 @@ func (h *AccountHandler) Login(c *gin.Context) {
 	c.JSON(http.StatusCreated, response)
 }
 
-func (h *AccountHandler) GetCurrentAccount(c *gin.Context) {
-	account, _ := c.Get("currentUser")
+func (h *AccountHandler) GetAccountDetails(c *gin.Context) {
+	accountUUID := c.Param("uuid")
+	account, err := h.service.Details(uuid.MustParse(accountUUID))
+	if err != nil {
+		response := response.Response{
+			Success: false,
+			Message: "Something went wrong",
+			Data:    err.Error(),
+		}
+		c.JSON(http.StatusNotFound, response)
+		return
+	}
 	response := response.Response{
 		Success: true,
 		Message: "Successfully retrieved current account.",
@@ -107,8 +117,8 @@ func (h *AccountHandler) UpdateAccountDetails(c *gin.Context) {
 		return
 	}
 
-	account, _ := c.Get("currentUser")
-	updatedAccount, err := h.service.Update(account.(uuid.UUID), input)
+	accountUUID := c.Param("uuid")
+	updatedAccount, err := h.service.Update(uuid.MustParse(accountUUID), input)
 	if err != nil {
 		response := response.Response{
 			Success: false,

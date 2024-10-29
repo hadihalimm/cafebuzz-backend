@@ -14,27 +14,27 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type CafeService interface {
-	Register(request request.CafeRegisterRequest) (*models.Cafe, error)
+type CafeAccountService interface {
+	Register(request request.CafeRegisterRequest) (*models.CafeAccount, error)
 	Login(request request.LoginRequest) (string, error)
-	Details(uuid uuid.UUID) (*models.Cafe, error)
-	Update(uuid uuid.UUID, request request.CafeUpdateRequest) (*models.Cafe, error)
+	Details(uuid uuid.UUID) (*models.CafeAccount, error)
+	Update(uuid uuid.UUID, request request.CafeUpdateRequest) (*models.CafeAccount, error)
 }
 
-type cafeService struct {
-	repo     repository.CafeRepository
+type cafeAccountService struct {
+	repo     repository.CafeAccountRepository
 	validate *validator.Validate
 }
 
-func NewCafeService(repo repository.CafeRepository, validate *validator.Validate) CafeService {
-	return &cafeService{
+func NewCafeAccountService(repo repository.CafeAccountRepository, validate *validator.Validate) CafeAccountService {
+	return &cafeAccountService{
 		repo:     repo,
 		validate: validate,
 	}
 }
 
-func (s *cafeService) Register(request request.CafeRegisterRequest) (*models.Cafe, error) {
-	var cafeReq models.Cafe
+func (s *cafeAccountService) Register(request request.CafeRegisterRequest) (*models.CafeAccount, error) {
+	var cafeReq models.CafeAccount
 
 	validateError := s.validate.Struct(request)
 	if validateError != nil {
@@ -46,11 +46,11 @@ func (s *cafeService) Register(request request.CafeRegisterRequest) (*models.Caf
 		return nil, errors.New("username already exists")
 	}
 
-	cafeReq.Username = request.Username
-	cafeReq.Name = request.Name
-	cafeReq.Email = request.Email
+	cafeReq.Account.Username = request.Username
+	cafeReq.Account.Name = request.Name
+	cafeReq.Account.Email = request.Email
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
-	cafeReq.PasswordHash = string(hashedPassword)
+	cafeReq.Account.PasswordHash = string(hashedPassword)
 	cafeReq.Address = request.Address
 
 	newCafe, createError := s.repo.Create(&cafeReq)
@@ -60,8 +60,8 @@ func (s *cafeService) Register(request request.CafeRegisterRequest) (*models.Caf
 	return newCafe, nil
 }
 
-func (s *cafeService) Login(request request.LoginRequest) (string, error) {
-	var cafeFound *models.Cafe
+func (s *cafeAccountService) Login(request request.LoginRequest) (string, error) {
+	var cafeFound *models.CafeAccount
 
 	validateError := s.validate.Struct(request)
 	if validateError != nil {
@@ -73,13 +73,13 @@ func (s *cafeService) Login(request request.LoginRequest) (string, error) {
 		return "", findError
 	}
 
-	mismatchError := bcrypt.CompareHashAndPassword([]byte(cafeFound.PasswordHash), []byte(request.Password))
+	mismatchError := bcrypt.CompareHashAndPassword([]byte(cafeFound.Account.PasswordHash), []byte(request.Password))
 	if mismatchError != nil {
 		return "", mismatchError
 	}
 
 	generateToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"uuid":         cafeFound.UUID,
+		"uuid":         cafeFound.Account.UUID,
 		"account_type": "cafe",
 		"exp":          time.Now().Add(time.Hour * 24).Unix(),
 	})
@@ -92,7 +92,7 @@ func (s *cafeService) Login(request request.LoginRequest) (string, error) {
 	return token, nil
 }
 
-func (s *cafeService) Details(uuid uuid.UUID) (*models.Cafe, error) {
+func (s *cafeAccountService) Details(uuid uuid.UUID) (*models.CafeAccount, error) {
 	cafeFound, findError := s.repo.FindByUUID(uuid)
 	if findError != nil {
 		return nil, findError
@@ -100,16 +100,21 @@ func (s *cafeService) Details(uuid uuid.UUID) (*models.Cafe, error) {
 	return cafeFound, nil
 }
 
-func (s *cafeService) Update(uuid uuid.UUID, request request.CafeUpdateRequest) (*models.Cafe, error) {
+func (s *cafeAccountService) Update(uuid uuid.UUID, request request.CafeUpdateRequest) (*models.CafeAccount, error) {
+	validateError := s.validate.Struct(request)
+	if validateError != nil {
+		return nil, validateError
+	}
+
 	cafeFound, findError := s.repo.FindByUUID(uuid)
 	if findError != nil {
 		return nil, findError
 	}
 
-	cafeFound.Name = request.Name
+	cafeFound.Account.Name = request.Name
 	cafeFound.Description = request.Description
 	cafeFound.Address = request.Address
-	cafeFound.ProfilePicture = request.ProfilePicture
+	cafeFound.Account.ProfilePicture = request.ProfilePicture
 
 	updatedCafe, updateError := s.repo.Update(cafeFound)
 	if updateError != nil {

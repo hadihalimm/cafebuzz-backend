@@ -6,22 +6,22 @@ import (
 	"github.com/hadihalimm/cafebuzz-backend/internal/models"
 )
 
-type CafeRepository interface {
-	Create(cafe *models.Cafe) (*models.Cafe, error)
-	FindByUUID(uuid uuid.UUID) (*models.Cafe, error)
-	FindByUsername(username string) (*models.Cafe, error)
-	Update(cafe *models.Cafe) (*models.Cafe, error)
+type CafeAccountRepository interface {
+	Create(cafe *models.CafeAccount) (*models.CafeAccount, error)
+	FindByUUID(uuid uuid.UUID) (*models.CafeAccount, error)
+	FindByUsername(username string) (*models.CafeAccount, error)
+	Update(cafe *models.CafeAccount) (*models.CafeAccount, error)
 }
 
-type cafeRepository struct {
+type cafeAccountRepository struct {
 	db *config.Database
 }
 
-func NewCafeRepository(db *config.Database) CafeRepository {
-	return &cafeRepository{db: db}
+func NewCafeAccountRepository(db *config.Database) CafeAccountRepository {
+	return &cafeAccountRepository{db: db}
 }
 
-func (r *cafeRepository) Create(cafe *models.Cafe) (*models.Cafe, error) {
+func (r *cafeAccountRepository) Create(cafe *models.CafeAccount) (*models.CafeAccount, error) {
 	err := r.db.Gorm.Create(&cafe)
 	if err.Error != nil {
 		return nil, err.Error
@@ -29,8 +29,8 @@ func (r *cafeRepository) Create(cafe *models.Cafe) (*models.Cafe, error) {
 	return cafe, nil
 }
 
-func (r *cafeRepository) FindByUUID(uuid uuid.UUID) (*models.Cafe, error) {
-	var cafe models.Cafe
+func (r *cafeAccountRepository) FindByUUID(uuid uuid.UUID) (*models.CafeAccount, error) {
+	var cafe models.CafeAccount
 	err := r.db.Gorm.First(&cafe, uuid)
 	if err.Error != nil {
 		return nil, err.Error
@@ -38,8 +38,8 @@ func (r *cafeRepository) FindByUUID(uuid uuid.UUID) (*models.Cafe, error) {
 	return &cafe, nil
 }
 
-func (r *cafeRepository) FindByUsername(username string) (*models.Cafe, error) {
-	var cafe models.Cafe
+func (r *cafeAccountRepository) FindByUsername(username string) (*models.CafeAccount, error) {
+	var cafe models.CafeAccount
 	err := r.db.Gorm.Where("username = ?", username).First(&cafe)
 	if err.Error != nil {
 		return nil, err.Error
@@ -47,7 +47,7 @@ func (r *cafeRepository) FindByUsername(username string) (*models.Cafe, error) {
 	return &cafe, nil
 }
 
-func (r *cafeRepository) Update(cafe *models.Cafe) (*models.Cafe, error) {
+func (r *cafeAccountRepository) Update(cafe *models.CafeAccount) (*models.CafeAccount, error) {
 	err := r.db.Gorm.Save(&cafe)
 	if err.Error != nil {
 		return nil, err.Error

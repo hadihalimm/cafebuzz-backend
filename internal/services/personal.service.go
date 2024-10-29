@@ -14,27 +14,27 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type AccountService interface {
-	Register(request request.AccountRegisterRequest) (*models.Account, error)
+type PersonalAccountService interface {
+	Register(request request.AccountRegisterRequest) (*models.PersonalAccount, error)
 	Login(request request.LoginRequest) (string, error)
-	Details(uuid uuid.UUID) (*models.Account, error)
-	Update(uuid uuid.UUID, request request.AccountUpdateRequest) (*models.Account, error)
+	Details(uuid uuid.UUID) (*models.PersonalAccount, error)
+	Update(uuid uuid.UUID, request request.AccountUpdateRequest) (*models.PersonalAccount, error)
 }
 
-type accountService struct {
-	repo     repository.AccountRepository
+type personalAccountService struct {
+	repo     repository.PersonalAccountRepository
 	validate *validator.Validate
 }
 
-func NewAccountService(repository repository.AccountRepository, validate *validator.Validate) AccountService {
-	return &accountService{
+func NewPersonalAccountService(repository repository.PersonalAccountRepository, validate *validator.Validate) PersonalAccountService {
+	return &personalAccountService{
 		repo:     repository,
 		validate: validate,
 	}
 }
 
-func (s *accountService) Register(request request.AccountRegisterRequest) (*models.Account, error) {
-	var accountReq models.Account
+func (s *personalAccountService) Register(request request.AccountRegisterRequest) (*models.PersonalAccount, error) {
+	var accountReq models.PersonalAccount
 
 	validateError := s.validate.Struct(request)
 	if validateError != nil {
@@ -46,11 +46,11 @@ func (s *accountService) Register(request request.AccountRegisterRequest) (*mode
 		return nil, errors.New("username already exists")
 	}
 
-	accountReq.Username = request.Username
-	accountReq.Name = request.Name
-	accountReq.Email = request.Email
+	accountReq.Account.Username = request.Username
+	accountReq.Account.Name = request.Name
+	accountReq.Account.Email = request.Email
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
-	accountReq.PasswordHash = string(hashedPassword)
+	accountReq.Account.PasswordHash = string(hashedPassword)
 
 	newAccount, createError := s.repo.Create(&accountReq)
 	if createError != nil {
@@ -59,8 +59,8 @@ func (s *accountService) Register(request request.AccountRegisterRequest) (*mode
 	return newAccount, nil
 }
 
-func (s *accountService) Login(request request.LoginRequest) (string, error) {
-	var accountFound *models.Account
+func (s *personalAccountService) Login(request request.LoginRequest) (string, error) {
+	var accountFound *models.PersonalAccount
 
 	validateError := s.validate.Struct(request)
 	if validateError != nil {
@@ -72,13 +72,13 @@ func (s *accountService) Login(request request.LoginRequest) (string, error) {
 		return "", findError
 	}
 
-	mismatchError := bcrypt.CompareHashAndPassword([]byte(accountFound.PasswordHash), []byte(request.Password))
+	mismatchError := bcrypt.CompareHashAndPassword([]byte(accountFound.Account.PasswordHash), []byte(request.Password))
 	if mismatchError != nil {
 		return "", mismatchError
 	}
 
 	generateToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"uuid":         accountFound.UUID,
+		"uuid":         accountFound.Account.UUID,
 		"account_type": "personal",
 		"exp":          time.Now().Add(time.Hour * 24).Unix(),
 	})
@@ -91,7 +91,7 @@ func (s *accountService) Login(request request.LoginRequest) (string, error) {
 	return token, nil
 }
 
-func (s *accountService) Details(uuid uuid.UUID) (*models.Account, error) {
+func (s *personalAccountService) Details(uuid uuid.UUID) (*models.PersonalAccount, error) {
 	accountFound, findError := s.repo.FindByUUID(uuid)
 	if findError != nil {
 		return nil, findError
@@ -99,14 +99,14 @@ func (s *accountService) Details(uuid uuid.UUID) (*models.Account, error) {
 	return accountFound, nil
 }
 
-func (s *accountService) Update(uuid uuid.UUID, request request.AccountUpdateRequest) (*models.Account, error) {
+func (s *personalAccountService) Update(uuid uuid.UUID, request request.AccountUpdateRequest) (*models.PersonalAccount, error) {
 	accountFound, findError := s.repo.FindByUUID(uuid)
 	if findError != nil {
 		return nil, findError
 	}
 
-	accountFound.Name = request.Name
-	accountFound.ProfilePicture = request.ProfilePicture
+	accountFound.Account.Name = request.Name
+	accountFound.Account.ProfilePicture = request.ProfilePicture
 	accountFound.Bio = request.Bio
 	updatedAccount, updateError := s.repo.Update(accountFound)
 	if updateError != nil {

@@ -56,23 +56,23 @@ func (s *Server) RequireAuth(c *gin.Context) {
 	}
 
 	if claims["type"] == "personal" {
-		var account models.Account
+		var account models.PersonalAccount
 		s.DB.Gorm.Where("UUID = ?", claims["uuid"]).Find(&account)
-		if account.UUID == uuid.Nil {
+		if account.Account.UUID == uuid.Nil {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-		c.Set("currentUser", account.UUID)
+		c.Set("currentUser", account.Account.UUID)
 		c.Next()
 	}
 	if claims["type"] == "cafe" {
-		var cafe models.Cafe
+		var cafe models.CafeAccount
 		s.DB.Gorm.Where("UUID = ?", claims["uuid"]).Find(&cafe)
-		if cafe.UUID == uuid.Nil {
+		if cafe.Account.UUID == uuid.Nil {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-		c.Set("currentUser", cafe.UUID)
+		c.Set("currentUser", cafe.Account.UUID)
 		c.Next()
 	}
 

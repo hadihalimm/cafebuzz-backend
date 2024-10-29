@@ -11,10 +11,10 @@ import (
 )
 
 type CafeHandler struct {
-	service services.CafeService
+	service services.CafeAccountService
 }
 
-func NewCafeHandler(service services.CafeService) *CafeHandler {
+func NewCafeAccountHandler(service services.CafeAccountService) *CafeHandler {
 	return &CafeHandler{service: service}
 }
 

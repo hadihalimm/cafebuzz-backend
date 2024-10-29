@@ -25,17 +25,17 @@ type Server struct {
 func NewServer() (*http.Server, *Server) {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	DB := config.ConnectToDatabase()
-	DB.DropTable(&models.Account{}, &models.Cafe{})
-	DB.AutoMigrate(&models.Account{}, &models.Cafe{})
+	DB.DropTable(&models.Account{}, &models.PersonalAccount{}, &models.CafeAccount{})
+	DB.AutoMigrate(&models.Account{}, &models.PersonalAccount{}, &models.CafeAccount{})
 	validate := validator.New()
 
-	accountRepo := repository.NewAccountRepository(DB)
-	accountService := services.NewAccountService(accountRepo, validate)
-	accountHandler := handler.NewAccountHandler(accountService)
+	accountRepo := repository.NewPersonalAccountRepository(DB)
+	accountService := services.NewPersonalAccountService(accountRepo, validate)
+	accountHandler := handler.NewPersonalAccountHandler(accountService)
 
-	cafeRepo := repository.NewCafeRepository(DB)
-	cafeService := services.NewCafeService(cafeRepo, validate)
-	cafeHandler := handler.NewCafeHandler(cafeService)
+	cafeRepo := repository.NewCafeAccountRepository(DB)
+	cafeService := services.NewCafeAccountService(cafeRepo, validate)
+	cafeHandler := handler.NewCafeAccountHandler(cafeService)
 
 	NewServer := &Server{
 		port:           port,

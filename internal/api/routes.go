@@ -11,13 +11,20 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	v1 := r.Group("api/v1")
 	{
-		v1.POST("/register", s.accountHandler.Register)
-		v1.POST("/login", s.accountHandler.Login)
 
 		account := v1.Group("/account")
 		{
-			account.GET("/", s.RequireAuth, s.accountHandler.GetCurrentAccount)
-			account.PUT("/", s.RequireAuth, s.accountHandler.UpdateAccountDetails)
+			account.POST("/login", s.accountHandler.Login)
+			account.POST("/register", s.accountHandler.Register)
+			account.GET("/:uuid", s.RequireAuth, s.accountHandler.GetAccountDetails)
+			account.PUT("/:uuid", s.RequireAuth, s.accountHandler.UpdateAccountDetails)
+		}
+		cafe := v1.Group("/cafe")
+		{
+			cafe.POST("/login", s.cafeHandler.Login)
+			cafe.POST("/register", s.cafeHandler.Register)
+			cafe.GET("/:uuid", s.RequireAuth, s.cafeHandler.GetCafeDetails)
+			cafe.PUT("/:uuid", s.RequireAuth, s.cafeHandler.UpdateCafeDetails)
 		}
 	}
 

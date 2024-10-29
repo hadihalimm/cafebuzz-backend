@@ -41,8 +41,8 @@ func (s *cafeService) Register(request request.CafeRegisterRequest) (*models.Caf
 		return nil, validateError
 	}
 
-	_, findError := s.repo.FindByUsername(request.Username)
-	if findError != nil {
+	cafeFound, _ := s.repo.FindByUsername(request.Username)
+	if cafeFound != nil {
 		return nil, errors.New("username already exists")
 	}
 

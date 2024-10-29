@@ -84,6 +84,26 @@ func (h *CafeHandler) Login(c *gin.Context) {
 	c.JSON(http.StatusCreated, response)
 }
 
+func (h *CafeHandler) GetCafeDetails(c *gin.Context) {
+	cafeUUID := c.Param("uuid")
+	cafe, err := h.service.Details(uuid.MustParse(cafeUUID))
+	if err != nil {
+		response := response.Response{
+			Success: false,
+			Message: "Something went wrong",
+			Data:    err.Error(),
+		}
+		c.JSON(http.StatusNotFound, response)
+		return
+	}
+	response := response.Response{
+		Success: true,
+		Message: "Successfully retrieved current cafe",
+		Data:    cafe,
+	}
+	c.JSON(http.StatusOK, response)
+}
+
 func (h *CafeHandler) UpdateCafeDetails(c *gin.Context) {
 	var input request.CafeUpdateRequest
 	err := c.ShouldBindJSON(&input)
@@ -97,8 +117,8 @@ func (h *CafeHandler) UpdateCafeDetails(c *gin.Context) {
 		return
 	}
 
-	cafe, _ := c.Get("currentUser")
-	updatedCafe, err := h.service.Update(cafe.(uuid.UUID), input)
+	cafeUUID := c.Param("uuid")
+	updatedCafe, err := h.service.Update(uuid.MustParse(cafeUUID), input)
 	if err != nil {
 		response := response.Response{
 			Success: false,

@@ -6,8 +6,16 @@ import (
 	"github.com/google/uuid"
 )
 
+type Tabler interface {
+	TableName() string
+}
+
+func (Cafe) TableName() string {
+	return "cafes"
+}
+
 type Cafe struct {
-	UUID           uuid.UUID `json:"uuid" gorm:"primaryKey"`
+	UUID           uuid.UUID `json:"uuid" gorm:"primaryKey;default:uuid_generate_v4()"`
 	Username       string    `json:"username" gorm:"unique;not null"`
 	Name           string    `json:"name" gorm:"not null"`
 	Email          string    `json:"email" gorm:"unique;not null"`

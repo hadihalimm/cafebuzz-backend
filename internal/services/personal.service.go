@@ -41,8 +41,8 @@ func (s *personalAccountService) Register(request request.AccountRegisterRequest
 		return nil, validateError
 	}
 
-	_, findError := s.repo.FindByUsername(request.Username)
-	if findError == nil {
+	existedAccount, _ := s.repo.FindByUsername(request.Username)
+	if existedAccount != nil {
 		return nil, errors.New("username already exists")
 	}
 
@@ -100,6 +100,11 @@ func (s *personalAccountService) Details(uuid uuid.UUID) (*models.PersonalAccoun
 }
 
 func (s *personalAccountService) Update(uuid uuid.UUID, request request.AccountUpdateRequest) (*models.PersonalAccount, error) {
+	validateError := s.validate.Struct(request)
+	if validateError != nil {
+		return nil, validateError
+	}
+
 	accountFound, findError := s.repo.FindByUUID(uuid)
 	if findError != nil {
 		return nil, findError

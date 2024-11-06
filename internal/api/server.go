@@ -20,13 +20,14 @@ type Server struct {
 	DB             *config.Database
 	accountHandler *handler.AccountHandler
 	cafeHandler    *handler.CafeHandler
+	postHandler    *handler.PostHandler
 }
 
 func NewServer() (*http.Server, *Server) {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	DB := config.ConnectToDatabase()
-	DB.DropTable(&models.Account{}, &models.PersonalAccount{}, &models.CafeAccount{})
-	DB.AutoMigrate(&models.Account{}, &models.PersonalAccount{}, &models.CafeAccount{})
+	DB.DropTable(&models.Account{}, &models.PersonalAccount{}, &models.CafeAccount{}, &models.Post{})
+	DB.AutoMigrate(&models.PersonalAccount{}, &models.CafeAccount{}, &models.Post{})
 	validate := validator.New()
 
 	accountRepo := repository.NewPersonalAccountRepository(DB)
@@ -37,11 +38,16 @@ func NewServer() (*http.Server, *Server) {
 	cafeService := services.NewCafeAccountService(cafeRepo, validate)
 	cafeHandler := handler.NewCafeAccountHandler(cafeService)
 
+	postRepo := repository.NewPostRepository(DB)
+	postService := services.NewPostService(postRepo, validate)
+	postHandler := handler.NewPostHandler(postService)
+
 	NewServer := &Server{
 		port:           port,
 		DB:             DB,
 		accountHandler: accountHandler,
 		cafeHandler:    cafeHandler,
+		postHandler:    postHandler,
 	}
 
 	server := &http.Server{

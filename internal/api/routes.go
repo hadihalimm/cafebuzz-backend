@@ -18,6 +18,11 @@ func (s *Server) RegisterRoutes() http.Handler {
 			account.POST("/register", s.accountHandler.Register)
 			account.GET("/:uuid", s.RequireAuth, s.accountHandler.GetAccountDetails)
 			account.PUT("/:uuid", s.RequireAuth, s.accountHandler.UpdateAccountDetails)
+			post := account.Group("/:uuid")
+			{
+				post.GET("/posts", s.postHandler.FindAllByCreator)
+				post.GET("/post/:postID", s.postHandler.FindByID)
+			}
 		}
 		cafe := v1.Group("/cafe")
 		{
@@ -25,6 +30,11 @@ func (s *Server) RegisterRoutes() http.Handler {
 			cafe.POST("/register", s.cafeHandler.Register)
 			cafe.GET("/:uuid", s.RequireAuth, s.cafeHandler.GetCafeDetails)
 			cafe.PUT("/:uuid", s.RequireAuth, s.cafeHandler.UpdateCafeDetails)
+			post := cafe.Group("/:uuid")
+			{
+				post.GET("/posts", s.postHandler.FindAllByCreator)
+				post.GET("/post/:postID", s.postHandler.FindByID)
+			}
 		}
 	}
 

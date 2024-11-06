@@ -63,6 +63,7 @@ func (s *Server) RequireAuth(c *gin.Context) {
 			return
 		}
 		c.Set("currentUser", account.Account.UUID)
+		c.Set("userType", "personal")
 		c.Next()
 	}
 	if claims["type"] == "cafe" {
@@ -73,6 +74,7 @@ func (s *Server) RequireAuth(c *gin.Context) {
 			return
 		}
 		c.Set("currentUser", cafe.Account.UUID)
+		c.Set("userType", "cafe")
 		c.Next()
 	}
 

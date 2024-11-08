@@ -20,8 +20,9 @@ func (s *Server) RegisterRoutes() http.Handler {
 			account.PUT("/:uuid", s.RequireAuth, s.accountHandler.UpdateAccountDetails)
 			post := account.Group("/:uuid")
 			{
-				post.GET("/posts", s.postHandler.FindAllByCreator)
-				post.GET("/post/:postID", s.postHandler.FindByID)
+				post.POST("/post/create", s.RequireAuth, s.postHandler.Create)
+				post.GET("/posts", s.RequireAuth, s.postHandler.FindAllByCreator)
+				post.GET("/post/:postID", s.RequireAuth, s.postHandler.FindByID)
 			}
 		}
 		cafe := v1.Group("/cafe")
@@ -32,8 +33,9 @@ func (s *Server) RegisterRoutes() http.Handler {
 			cafe.PUT("/:uuid", s.RequireAuth, s.cafeHandler.UpdateCafeDetails)
 			post := cafe.Group("/:uuid")
 			{
-				post.GET("/posts", s.postHandler.FindAllByCreator)
-				post.GET("/post/:postID", s.postHandler.FindByID)
+				post.POST("/post/create", s.RequireAuth, s.postHandler.Create)
+				post.GET("/posts", s.RequireAuth, s.postHandler.FindAllByCreator)
+				post.GET("/post/:postID", s.RequireAuth, s.postHandler.FindByID)
 			}
 		}
 	}

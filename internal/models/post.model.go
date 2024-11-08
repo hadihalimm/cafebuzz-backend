@@ -8,7 +8,7 @@ import (
 
 type Post struct {
 	ID          uint64    `json:"id" gorm:"primaryKey"`
-	CreatorID   uuid.UUID `json:"created_by" gorm:"index;not null"`
+	CreatorUUID uuid.UUID `json:"created_by" gorm:"index;not null"`
 	CreatorType string    `json:"owner_type" gorm:"not null"`
 	ImageURL    string    `json:"image_url" gorm:"size:255;not null"`
 	Caption     string    `json:"caption" gorm:"size:500"`

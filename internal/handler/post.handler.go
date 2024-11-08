@@ -32,7 +32,9 @@ func (h *PostHandler) Create(c *gin.Context) {
 		return
 	}
 
-	result, err := h.service.Create(input)
+	creatorUUID := uuid.MustParse(c.Param("uuid"))
+	creatorType := c.GetString("userType")
+	result, err := h.service.Create(input, creatorUUID, creatorType)
 	if err != nil {
 		response := response.Response{
 			Success: false,

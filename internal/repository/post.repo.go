@@ -39,7 +39,7 @@ func (r *postRepository) FindByID(id uint64) (*models.Post, error) {
 
 func (r *postRepository) FindAllByCreator(creatorUUID uuid.UUID) ([]*models.Post, error) {
 	var post []*models.Post
-	err := r.db.Gorm.Order("created_at asc").Where("creator_id = ?", creatorUUID).Find(&post)
+	err := r.db.Gorm.Order("created_at asc").Where("creator_uuid = ?", creatorUUID).Find(&post)
 	if err.Error != nil {
 		return nil, err.Error
 	}

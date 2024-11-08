@@ -9,7 +9,7 @@ import (
 )
 
 type PostService interface {
-	Create(request request.PostCreateRequest) (*models.Post, error)
+	Create(request request.PostCreateRequest, creatorUUID uuid.UUID, creatorType string) (*models.Post, error)
 	FindByID(id uint64) (*models.Post, error)
 	FindAllByCreator(creatorUUID uuid.UUID) ([]*models.Post, error)
 }
@@ -23,7 +23,7 @@ func NewPostService(repo repository.PostRepository, validate *validator.Validate
 	return &postService{repo: repo, validate: validate}
 }
 
-func (s *postService) Create(request request.PostCreateRequest) (*models.Post, error) {
+func (s *postService) Create(request request.PostCreateRequest, creatorUUID uuid.UUID, creatorType string) (*models.Post, error) {
 	var postReq models.Post
 
 	validateError := s.validate.Struct(request)
@@ -31,6 +31,8 @@ func (s *postService) Create(request request.PostCreateRequest) (*models.Post, e
 		return nil, validateError
 	}
 
+	postReq.CreatorUUID = creatorUUID
+	postReq.CreatorType = creatorType
 	postReq.ImageURL = request.ImageURL
 	postReq.Caption = request.Caption
 	newPost, createError := s.repo.Create(&postReq)

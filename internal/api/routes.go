@@ -38,6 +38,13 @@ func (s *Server) RegisterRoutes() http.Handler {
 				post.GET("/post/:postID", s.RequireAuth, s.postHandler.FindByID)
 			}
 		}
+		follow := v1.Group("/follow")
+		{
+			follow.POST("/create/:followerUUID/personal/:followedUUID", s.RequireAuth, s.followHandler.CreateFollowPersonal)
+			follow.POST("/create/:followerUUID/cafe/:followedUUID", s.RequireAuth, s.followHandler.CreateFollowCafe)
+			follow.GET("/following/:uuid", s.RequireAuth, s.followHandler.GetAllFollowing)
+			follow.GET("/followers/:uuid", s.RequireAuth, s.followHandler.GetAllFollowers)
+		}
 	}
 
 	return r

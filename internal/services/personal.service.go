@@ -19,6 +19,7 @@ type PersonalAccountService interface {
 	Login(request request.LoginRequest) (string, error)
 	Details(uuid uuid.UUID) (*models.PersonalAccount, error)
 	Update(uuid uuid.UUID, request request.AccountUpdateRequest) (*models.PersonalAccount, error)
+	Delete(uuid uuid.UUID) error
 }
 
 type personalAccountService struct {
@@ -118,4 +119,8 @@ func (s *personalAccountService) Update(uuid uuid.UUID, request request.AccountU
 		return nil, updateError
 	}
 	return updatedAccount, nil
+}
+
+func (s *personalAccountService) Delete(uuid uuid.UUID) error {
+	return s.repo.Delete(uuid)
 }

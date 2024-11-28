@@ -11,6 +11,7 @@ type PersonalAccountRepository interface {
 	FindByUUID(uuid uuid.UUID) (*models.PersonalAccount, error)
 	FindByUsername(username string) (*models.PersonalAccount, error)
 	Update(account *models.PersonalAccount) (*models.PersonalAccount, error)
+	Delete(uuid uuid.UUID) error
 }
 
 type personalAccountRepository struct {
@@ -54,4 +55,13 @@ func (r *personalAccountRepository) Update(account *models.PersonalAccount) (*mo
 		return nil, err.Error
 	}
 	return account, nil
+}
+
+func (r *personalAccountRepository) Delete(uuid uuid.UUID) error {
+	var account models.PersonalAccount
+	err := r.db.Gorm.Delete(&account, uuid)
+	if err.Error != nil {
+		return err.Error
+	}
+	return nil
 }

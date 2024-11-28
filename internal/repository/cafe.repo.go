@@ -11,6 +11,7 @@ type CafeAccountRepository interface {
 	FindByUUID(uuid uuid.UUID) (*models.CafeAccount, error)
 	FindByUsername(username string) (*models.CafeAccount, error)
 	Update(cafe *models.CafeAccount) (*models.CafeAccount, error)
+	Delete(uuid uuid.UUID) error
 }
 
 type cafeAccountRepository struct {
@@ -53,4 +54,13 @@ func (r *cafeAccountRepository) Update(cafe *models.CafeAccount) (*models.CafeAc
 		return nil, err.Error
 	}
 	return cafe, nil
+}
+
+func (r *cafeAccountRepository) Delete(uuid uuid.UUID) error {
+	var cafe models.CafeAccount
+	err := r.db.Gorm.Delete(&cafe, uuid)
+	if err.Error != nil {
+		return err.Error
+	}
+	return nil
 }

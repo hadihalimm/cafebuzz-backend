@@ -136,3 +136,23 @@ func (h *AccountHandler) UpdateAccountDetails(c *gin.Context) {
 	}
 	c.JSON(http.StatusCreated, response)
 }
+
+func (h *AccountHandler) DeleteAccount(c *gin.Context) {
+	accountUUID := c.Param("uuid")
+	err := h.service.Delete(uuid.MustParse(accountUUID))
+	if err != nil {
+		response := response.Response{
+			Success: false,
+			Message: "Something went wrong",
+			Data:    err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	response := response.Response{
+		Success: true,
+		Message: "Successfully deleted the account.",
+		Data:    nil,
+	}
+	c.JSON(http.StatusOK, response)
+}

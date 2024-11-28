@@ -12,6 +12,7 @@ type PostService interface {
 	Create(request request.PostCreateRequest, creatorUUID uuid.UUID, creatorType string) (*models.Post, error)
 	FindByID(id uint64) (*models.Post, error)
 	FindAllByCreator(creatorUUID uuid.UUID) ([]*models.Post, error)
+	Delete(id uint64) error
 }
 
 type postService struct {
@@ -56,4 +57,8 @@ func (s *postService) FindAllByCreator(creatorUUID uuid.UUID) ([]*models.Post, e
 		return nil, findError
 	}
 	return postFound, nil
+}
+
+func (s *postService) Delete(id uint64) error {
+	return s.repo.Delete(id)
 }

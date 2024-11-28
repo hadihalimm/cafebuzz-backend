@@ -11,6 +11,7 @@ type FollowService interface {
 	Create(followerUUID uuid.UUID, followedUUID uuid.UUID, followType string) (*models.Follow, error)
 	FindFollowingsByUUID(uuid uuid.UUID) ([]*models.PersonalAccount, []*models.CafeAccount, error)
 	FindFollowersByUUID(uuid uuid.UUID) ([]*models.PersonalAccount, []*models.CafeAccount, error)
+	Delete(id uint8) error
 }
 
 type followService struct {
@@ -49,4 +50,8 @@ func (s *followService) FindFollowersByUUID(uuid uuid.UUID) ([]*models.PersonalA
 		return nil, nil, err
 	}
 	return personalFollowers, cafeFollowers, nil
+}
+
+func (s *followService) Delete(id uint8) error {
+	return s.repo.Delete(id)
 }

@@ -10,6 +10,7 @@ type FollowRepository interface {
 	Create(follow *models.Follow) (*models.Follow, error)
 	FindFollowingByUUID(uuid uuid.UUID) ([]*models.PersonalAccount, []*models.CafeAccount, error)
 	FindFollowersByUUID(uuid uuid.UUID) ([]*models.PersonalAccount, []*models.CafeAccount, error)
+	Delete(id uint8) error
 }
 
 type followRepository struct {
@@ -77,4 +78,13 @@ func (r *followRepository) FindFollowersByUUID(uuid uuid.UUID) ([]*models.Person
 		}
 	}
 	return followersAccounts, followersCafes, nil
+}
+
+func (r *followRepository) Delete(id uint8) error {
+	var follow models.Follow
+	err := r.db.Gorm.Delete(follow, id)
+	if err.Error != nil {
+		return err.Error
+	}
+	return nil
 }

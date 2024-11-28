@@ -18,11 +18,13 @@ func (s *Server) RegisterRoutes() http.Handler {
 			account.POST("/register", s.accountHandler.Register)
 			account.GET("/:uuid", s.RequireAuth, s.accountHandler.GetAccountDetails)
 			account.PUT("/:uuid", s.RequireAuth, s.accountHandler.UpdateAccountDetails)
+			account.DELETE("/:uuid", s.RequireAuth, s.accountHandler.DeleteAccount)
 			post := account.Group("/:uuid")
 			{
 				post.POST("/post/create", s.RequireAuth, s.postHandler.Create)
 				post.GET("/posts", s.RequireAuth, s.postHandler.FindAllByCreator)
 				post.GET("/post/:postID", s.RequireAuth, s.postHandler.FindByID)
+				post.DELETE("/post/:postID", s.RequireAuth, s.postHandler.DeletePost)
 			}
 		}
 		cafe := v1.Group("/cafe")
@@ -31,11 +33,13 @@ func (s *Server) RegisterRoutes() http.Handler {
 			cafe.POST("/register", s.cafeHandler.Register)
 			cafe.GET("/:uuid", s.RequireAuth, s.cafeHandler.GetCafeDetails)
 			cafe.PUT("/:uuid", s.RequireAuth, s.cafeHandler.UpdateCafeDetails)
+			cafe.DELETE("/:uuid", s.RequireAuth, s.cafeHandler.DeleteCafe)
 			post := cafe.Group("/:uuid")
 			{
 				post.POST("/post/create", s.RequireAuth, s.postHandler.Create)
 				post.GET("/posts", s.RequireAuth, s.postHandler.FindAllByCreator)
 				post.GET("/post/:postID", s.RequireAuth, s.postHandler.FindByID)
+				post.DELETE("/post/:postID", s.RequireAuth, s.postHandler.DeletePost)
 			}
 		}
 		follow := v1.Group("/follow")

@@ -19,6 +19,7 @@ type CafeAccountService interface {
 	Login(request request.LoginRequest) (string, error)
 	Details(uuid uuid.UUID) (*models.CafeAccount, error)
 	Update(uuid uuid.UUID, request request.CafeUpdateRequest) (*models.CafeAccount, error)
+	Delete(uuid uuid.UUID) error
 }
 
 type cafeAccountService struct {
@@ -121,4 +122,8 @@ func (s *cafeAccountService) Update(uuid uuid.UUID, request request.CafeUpdateRe
 		return nil, updateError
 	}
 	return updatedCafe, nil
+}
+
+func (s *cafeAccountService) Delete(uuid uuid.UUID) error {
+	return s.repo.Delete(uuid)
 }

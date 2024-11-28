@@ -93,3 +93,23 @@ func (h *PostHandler) FindAllByCreator(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, response)
 }
+
+func (h *PostHandler) DeletePost(c *gin.Context) {
+	postID, _ := strconv.ParseUint(c.Param("postID"), 10, 64)
+	err := h.service.Delete(postID)
+	if err != nil {
+		response := response.Response{
+			Success: false,
+			Message: "Something went wrong",
+			Data:    err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	response := response.Response{
+		Success: true,
+		Message: "Successfully deleted the post.",
+		Data:    nil,
+	}
+	c.JSON(http.StatusOK, response)
+}

@@ -48,6 +48,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 			follow.POST("/create/:followerUUID/cafe/:followedUUID", s.RequireAuth, s.followHandler.CreateFollowCafe)
 			follow.GET("/following/:uuid", s.RequireAuth, s.followHandler.GetAllFollowing)
 			follow.GET("/followers/:uuid", s.RequireAuth, s.followHandler.GetAllFollowers)
+			follow.DELETE("/delete/:followerUUID/:followedUUID", s.RequireAuth, s.followHandler.Delete)
 		}
 	}
 

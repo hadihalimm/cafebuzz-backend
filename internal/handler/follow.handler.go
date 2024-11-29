@@ -80,7 +80,7 @@ func (h *FollowHandler) GetAllFollowing(c *gin.Context) {
 }
 
 func (h *FollowHandler) GetAllFollowers(c *gin.Context) {
-	personalFollowing, cafeFollowing, err := h.service.FindFollowersByUUID(uuid.MustParse(c.Param("uuid")))
+	personalFollowers, cafeFollowers, err := h.service.FindFollowersByUUID(uuid.MustParse(c.Param("uuid")))
 	if err != nil {
 		response := response.Response{
 			Success: false,
@@ -94,7 +94,29 @@ func (h *FollowHandler) GetAllFollowers(c *gin.Context) {
 	response := response.Response{
 		Success: true,
 		Message: "Successfully retrieved all followers!",
-		Data:    []interface{}{personalFollowing, cafeFollowing},
+		Data:    []interface{}{personalFollowers, cafeFollowers},
 	}
 	c.JSON(http.StatusCreated, response)
+}
+
+func (h *FollowHandler) Delete(c *gin.Context) {
+	followerUUID := uuid.MustParse(c.GetString("currentAccount"))
+	followedUUID := uuid.MustParse(c.Param("followedUUID"))
+	err := h.service.Delete(followerUUID, followedUUID)
+	if err != nil {
+		response := response.Response{
+			Success: false,
+			Message: "Something went wrong",
+			Data:    err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := response.Response{
+		Success: true,
+		Message: "Successfully deleted the follow!",
+		Data:    nil,
+	}
+	c.JSON(http.StatusOK, response)
 }

@@ -1,0 +1,732 @@
+basePath: /api/v1
+definitions:
+  request.AccountRegisterRequest:
+    properties:
+      email:
+        maxLength: 128
+        minLength: 1
+        type: string
+      name:
+        maxLength: 128
+        minLength: 1
+        type: string
+      password:
+        maxLength: 32
+        minLength: 8
+        type: string
+      username:
+        maxLength: 64
+        minLength: 1
+        type: string
+    required:
+    - email
+    - name
+    - password
+    - username
+    type: object
+  request.AccountUpdateRequest:
+    properties:
+      bio:
+        type: string
+      name:
+        maxLength: 128
+        minLength: 1
+        type: string
+      profile_picture:
+        type: string
+    required:
+    - name
+    type: object
+  request.CafeRegisterRequest:
+    properties:
+      address:
+        minLength: 8
+        type: string
+      email:
+        maxLength: 128
+        minLength: 1
+        type: string
+      name:
+        maxLength: 128
+        minLength: 1
+        type: string
+      password:
+        maxLength: 32
+        minLength: 8
+        type: string
+      username:
+        maxLength: 64
+        minLength: 1
+        type: string
+    required:
+    - address
+    - email
+    - name
+    - password
+    - username
+    type: object
+  request.CafeUpdateRequest:
+    properties:
+      address:
+        type: string
+      description:
+        type: string
+      name:
+        maxLength: 128
+        minLength: 1
+        type: string
+      profile_picture:
+        type: string
+    required:
+    - address
+    - name
+    type: object
+  request.LoginRequest:
+    properties:
+      password:
+        maxLength: 32
+        minLength: 1
+        type: string
+      username:
+        maxLength: 64
+        minLength: 1
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  request.PostCreateRequest:
+    properties:
+      caption:
+        type: string
+      image_url:
+        type: string
+    required:
+    - caption
+    - image_url
+    type: object
+  response.Response:
+    properties:
+      data: {}
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: 9Mf1o@example.com
+    name: API Support
+    url: http://www.swagger.io/support
+  description: CafeBuzz API
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: CafeBuzz API
+  version: "1.0"
+paths:
+  /account/{uuid}/post/{postID}:
+    delete:
+      consumes:
+      - application/json
+      description: delete a post
+      parameters:
+      - description: Post ID
+        in: path
+        name: postID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Delete a post
+      tags:
+      - post
+    get:
+      consumes:
+      - application/json
+      description: find a post by ID
+      parameters:
+      - description: Post ID
+        in: path
+        name: postID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Find a post by ID
+      tags:
+      - post
+  /account/{uuid}/post/create:
+    post:
+      consumes:
+      - application/json
+      description: create a new post
+      parameters:
+      - description: Post create request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.PostCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Create a new post
+      tags:
+      - post
+  /account/{uuid}/posts:
+    get:
+      consumes:
+      - application/json
+      description: find all posts by creator
+      parameters:
+      - description: Creator UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Find all posts by creator
+      tags:
+      - post
+  /account/login:
+    post:
+      consumes:
+      - application/json
+      description: authenticate & authorize a personal account
+      parameters:
+      - description: Login request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Login a personal account
+      tags:
+      - personalAccount
+  /account/register:
+    post:
+      consumes:
+      - application/json
+      description: create a new personal account
+      parameters:
+      - description: Account register request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.AccountRegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Register a new personal account
+      tags:
+      - personalAccount
+  /account{uuid}:
+    delete:
+      consumes:
+      - application/json
+      description: delete current account
+      parameters:
+      - description: Account UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Delete current account
+      tags:
+      - personalAccount
+    get:
+      consumes:
+      - application/json
+      description: get current account details
+      parameters:
+      - description: Account UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Retrieve current account details
+      tags:
+      - personalAccount
+    put:
+      consumes:
+      - application/json
+      description: update current account details
+      parameters:
+      - description: Account update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.AccountUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Update current account details
+      tags:
+      - personalAccount
+  /cafe/{uuid}/post/{postID}:
+    delete:
+      consumes:
+      - application/json
+      description: delete a post
+      parameters:
+      - description: Post ID
+        in: path
+        name: postID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Delete a post
+      tags:
+      - post
+    get:
+      consumes:
+      - application/json
+      description: find a post by ID
+      parameters:
+      - description: Post ID
+        in: path
+        name: postID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Find a post by ID
+      tags:
+      - post
+  /cafe/{uuid}/post/create:
+    post:
+      consumes:
+      - application/json
+      description: create a new post
+      parameters:
+      - description: Post create request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.PostCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Create a new post
+      tags:
+      - post
+  /cafe/{uuid}/posts:
+    get:
+      consumes:
+      - application/json
+      description: find all posts by creator
+      parameters:
+      - description: Creator UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Find all posts by creator
+      tags:
+      - post
+  /cafe/login:
+    post:
+      consumes:
+      - application/json
+      description: authenticate & authorize a cafe account
+      parameters:
+      - description: Login request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Login a cafe account
+      tags:
+      - cafeAccount
+  /cafe/register:
+    post:
+      consumes:
+      - application/json
+      description: create a new cafe account
+      parameters:
+      - description: Cafe register request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.CafeRegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Register a new cafe account
+      tags:
+      - cafeAccount
+  /cafe{uuid}:
+    delete:
+      consumes:
+      - application/json
+      description: delete current cafe
+      parameters:
+      - description: Cafe UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Delete current cafe
+      tags:
+      - cafeAccount
+    get:
+      consumes:
+      - application/json
+      description: get current cafe details
+      parameters:
+      - description: Cafe UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get current cafe details
+      tags:
+      - cafeAccount
+    put:
+      consumes:
+      - application/json
+      description: update current cafe details
+      parameters:
+      - description: Cafe update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.CafeUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Update current cafe details
+      tags:
+      - cafeAccount
+  /follow/create/{followerUUID}/cafe/{followedUUID}:
+    post:
+      consumes:
+      - application/json
+      description: create a new follow by a cafe account
+      parameters:
+      - description: Follower UUID
+        in: header
+        name: followerUUID
+        required: true
+        type: string
+      - description: Followed UUID
+        in: path
+        name: followedUUID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Create a new follow by a cafe account
+      tags:
+      - follow
+  /follow/create/{followerUUID}/personal/{followedUUID}:
+    post:
+      consumes:
+      - application/json
+      description: create a new follow by a personal account
+      parameters:
+      - description: Follower UUID
+        in: header
+        name: followerUUID
+        required: true
+        type: string
+      - description: Followed UUID
+        in: path
+        name: followedUUID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Create a new follow by a personal account
+      tags:
+      - follow
+  /follow/delete/{followerUUID}/{followedUUID}:
+    delete:
+      consumes:
+      - application/json
+      description: delete a follow
+      parameters:
+      - description: Followed UUID
+        in: path
+        name: followedUUID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Delete a follow
+      tags:
+      - follow
+  /follow/followers/{uuid}:
+    get:
+      consumes:
+      - application/json
+      description: get all followers by uuid
+      parameters:
+      - description: UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get all followers by uuid
+      tags:
+      - follow
+  /follow/following/{uuid}:
+    get:
+      consumes:
+      - application/json
+      description: get all followings by uuid
+      parameters:
+      - description: UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get all followings by uuid
+      tags:
+      - follow
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"

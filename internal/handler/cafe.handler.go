@@ -18,6 +18,17 @@ func NewCafeAccountHandler(service services.CafeAccountService) *CafeHandler {
 	return &CafeHandler{service: service}
 }
 
+// RegisterCafeAccount godoc
+//
+// @Summary Register a new cafe account
+// @Description create a new cafe account
+// @Tags cafeAccount
+// @Accept json
+// @Produce json
+// @Param request body request.CafeRegisterRequest true "Cafe register request"
+// @Success 201 {object} response.Response
+// @Failure 400 {object} response.Response "Bad Request"
+// @Router /cafe/register [post]
 func (h *CafeHandler) Register(c *gin.Context) {
 	var input request.CafeRegisterRequest
 	err := c.ShouldBindJSON(&input)
@@ -50,6 +61,17 @@ func (h *CafeHandler) Register(c *gin.Context) {
 	c.JSON(http.StatusCreated, response)
 }
 
+// LoginCafeAccount godoc
+//
+// @Summary Login a cafe account
+// @Description authenticate & authorize a cafe account
+// @Tags cafeAccount
+// @Accept json
+// @Produce json
+// @Param request body request.LoginRequest true "Login request"
+// @Success 201 {object} response.Response
+// @Failure 400 {object} response.Response "Bad Request"
+// @Router /cafe/login [post]
 func (h *CafeHandler) Login(c *gin.Context) {
 	var input request.LoginRequest
 	err := c.ShouldBindJSON(&input)
@@ -84,6 +106,17 @@ func (h *CafeHandler) Login(c *gin.Context) {
 	c.JSON(http.StatusCreated, response)
 }
 
+// GetCafeDetails godoc
+//
+// @Summary Get current cafe details
+// @Description get current cafe details
+// @Tags cafeAccount
+// @Accept json
+// @Produce json
+// @Param uuid path string true "Cafe UUID"
+// @Success 200 {object} response.Response
+// @Failure 400 {object} response.Response "Bad Request"
+// @Router /cafe{uuid} [get]
 func (h *CafeHandler) GetCafeDetails(c *gin.Context) {
 	cafeUUID := c.Param("uuid")
 	cafe, err := h.service.Details(uuid.MustParse(cafeUUID))
@@ -93,7 +126,7 @@ func (h *CafeHandler) GetCafeDetails(c *gin.Context) {
 			Message: "Something went wrong",
 			Data:    err.Error(),
 		}
-		c.JSON(http.StatusNotFound, response)
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 	response := response.Response{
@@ -104,6 +137,17 @@ func (h *CafeHandler) GetCafeDetails(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// UpdateCafeDetails godoc
+//
+// @Summary Update current cafe details
+// @Description update current cafe details
+// @Tags cafeAccount
+// @Accept json
+// @Produce json
+// @Param request body request.CafeUpdateRequest true "Cafe update request"
+// @Success 201 {object} response.Response
+// @Failure 400 {object} response.Response "Bad Request"
+// @Router /cafe{uuid} [put]
 func (h *CafeHandler) UpdateCafeDetails(c *gin.Context) {
 	var input request.CafeUpdateRequest
 	err := c.ShouldBindJSON(&input)
@@ -137,6 +181,17 @@ func (h *CafeHandler) UpdateCafeDetails(c *gin.Context) {
 	c.JSON(http.StatusCreated, response)
 }
 
+// DeleteCafe godoc
+//
+// @Summary Delete current cafe
+// @Description delete current cafe
+// @Tags cafeAccount
+// @Accept json
+// @Produce json
+// @Param uuid path string true "Cafe UUID"
+// @Success 201 {object} response.Response
+// @Failure 400 {object} response.Response "Bad Request"
+// @Router /cafe{uuid} [delete]
 func (h *CafeHandler) DeleteCafe(c *gin.Context) {
 	cafeUUID := c.Param("uuid")
 	err := h.service.Delete(uuid.MustParse(cafeUUID))

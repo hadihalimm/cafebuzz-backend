@@ -4,6 +4,10 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+
+	docs "github.com/hadihalimm/cafebuzz-backend/docs"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
@@ -51,6 +55,9 @@ func (s *Server) RegisterRoutes() http.Handler {
 			follow.DELETE("/delete/:followerUUID/:followedUUID", s.RequireAuth, s.followHandler.Delete)
 		}
 	}
+
+	docs.SwaggerInfo.BasePath = "/api/v1"
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return r
 }
